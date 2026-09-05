@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>LH10 — 10-Agent Live Monitor 🦋</title>
+<style>
+body{background:#0b0e14;color:#d7dce5;font-family:Consolas,monospace;margin:0;padding:16px}
+h1{font-size:18px;margin:0 0 4px} .sub{color:#8b93a5;font-size:12px;margin-bottom:12px}
+#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.card{background:#131926;border:1px solid #263049;border-radius:8px;padding:10px;font-size:12px}
+.card b{font-size:13px} .ok{color:#5ee88a} .run{color:#ffcf5e} .fail{color:#ff6b6b}
+#log{background:#070a10;border:1px solid #263049;border-radius:8px;padding:10px;font-size:11px;white-space:pre-wrap;margin-top:12px;max-height:300px;overflow:auto}
+#meta{font-size:12px;color:#8b93a5;margin-bottom:10px}
+a{color:#7aa2ff}
+</style>
+</head>
+<body>
+<h1>🦋 LH10 — 10-Agent Live Monitor</h1>
+<div class="sub">auto-refresh 3s · <a href="/index.html">Mission Control</a> · <a href="/api/lh10">raw JSON</a></div>
+<div id="meta">connecting…</div>
+<div id="grid"></div>
+<div id="log"></div>
+<script>
+const NAMES=["scout","builder","guard","memory","ears","hands","sentinel","workbench","tester","scribe"];
+async function tick(){
+  try{
+    const r=await fetch("/api/lh10"); const d=await r.json();
+    const w=d.wave||0, ag=d.agents||{};
+    let done=0; NAMES.forEach(n=>{ if(ag[`${n}_w${w}`]) done++; });
+    document.getElementById("meta").textContent=
+      `wave ${w} · ${done}/10 jobs landed · outbox ${d.outbox_count||0} files · loop ${d.running?"RUNNING 🦋":"STOPPED"} · ${d.timestamp||""}`;
+    const g=document.getElementById("grid"); g.innerHTML="";
+    NAMES.forEach(n=>{
+      const r0=ag[`${n}_w${w}`];
+      const cls=!r0?"run":(r0.ok?"ok":"fail");
+      const txt=!r0?"WORKING…":((r0.ok?"OK ":"FAIL ")+`via ${r0.via} · ${r0.latency_s}s · ${r0.chars}ch`);
+      const div=document.createElement("div"); div.className="card";
+      div.innerHTML=`<b class="${cls}">● ${n}</b><br><span class="${cls}">${txt}</span>`;
+      g.appendChild(div);
+    });
+    document.getElementById("log").textContent=(d.log_tail||[]).join("");
+  }catch(e){ document.getElementById("meta").textContent="fetch error: "+e; }
+}
+tick(); setInterval(tick,3000);
+</script>
+</body>
+</html>
