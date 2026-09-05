@@ -1,0 +1,55 @@
+```
+# Version control files
+.gitignore
+
+# Documentation files (if generated)
+*.md.bak
+*.markdown.bak
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.local
+*.env.*
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+.coverage
+coverage/
+htmlcov/
+
+# Dependencies
+node_modules/
+venv/
+.venv/
+.mypy_cache/
+.pytest_cache/
+.tox/
+.nox/
+dist/
+build/
+target/
+.gradle/
+
+# System files
+.DS_Store
+Thumbs.db
+```
